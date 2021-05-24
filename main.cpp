@@ -69,6 +69,8 @@ VOID ChangeDraw(VOID);	//切り替え画面(描画)
 
 VOID ChangeScene(GAME_SCENE scene);	//シーン切り替え
 
+VOID CollUpdate(CHARACTOR* chara);	//当たり判定の領域を更新
+
 // プログラムは WinMain から始まります
 //Windowsのプログラミング方法 = (WinAPI)で動いている！
 //DxLibは、DirectXという、ゲームプログラミングをかんたんに使える仕組み
@@ -126,6 +128,9 @@ int WINAPI WinMain(
 
 	//画像の幅と高さを取得
 	GetGraphSize(player.handle, &player.width, &player.height);
+
+	//当たり判定を更新する
+	CollUpdate(&player);	//プレイヤーの当たり判定のアドレス
 
 		//プレイヤーを初期化
 		player.x = GAME_WIDTH / 2 - player.width / 2;
@@ -280,6 +285,24 @@ VOID PlayProc(VOID)
 		//エンド画面に切り替え
 		ChangeScene(GAME_SCENE_END);
 	}
+	if (KeyDown(KEY_INPUT_UP) == TRUE)
+	{
+		player.y -= player.speed;
+	}
+	if (KeyDown(KEY_INPUT_DOWN) == TRUE)
+	{
+		player.y += player.speed;
+	}
+	if (KeyDown(KEY_INPUT_LEFT) == TRUE)
+	{
+		player.x -= player.speed;
+	}
+	if (KeyDown(KEY_INPUT_RIGHT) == TRUE)
+	{
+		player.x += player.speed;
+	}
+	//当たり判定を更新する
+	CollUpdate(&player);
 
 	return;
 }
@@ -293,6 +316,13 @@ VOID PlayDraw(VOID)
 	if (player.IsDraw == TRUE)
 	{
 		DrawGraph(player.x, player.y, player.handle, TRUE);
+		//デバッグのときは、当たり判定の領域を描画
+		if (GAME_DEBUG == TRUE)
+		{
+			//四角を描画
+			DrawBox(player.coll.left, player.coll.top, player.coll.right, player.coll.bottom,
+				GetColor(255, 0, 0), FALSE);
+		}
 	}
 	DrawString(0, 0, "プレイ画面", GetColor(0, 0, 0));
 	return;
@@ -436,5 +466,18 @@ VOID ChangeDraw(VOID)
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	DrawString(0, 0, "切り替え画面", GetColor(0, 0, 0));
+	return;
+}
+/// <summary>
+/// 当たり判定の領域更新
+/// </summary>
+/// <param name="chara">当たり判定の領域</param>
+VOID CollUpdate(CHARACTOR* chara)
+{
+	chara->coll.left = chara->x;
+	chara->coll.top = chara->y;
+	chara->coll.right = chara->x + chara->width;
+	chara->coll.bottom = chara->y + chara->height;
+
 	return;
 }
