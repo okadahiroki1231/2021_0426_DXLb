@@ -63,7 +63,7 @@ VOID FPSDraw(VOID)
 	if (GAME_DEBUG == TRUE)
 	{
 	//•¶Žš—ñ‚ð•`‰æ
-	DrawFormatString(0, 20, GetColor(0, 0, 0), "FPS:%.lf", fps.DrawValuc);
+	DrawFormatString(0, GAME_HEIGHT - 20, GetColor(0, 0, 0), "FPS:%.1f", fps.DrawValuc);
 	}
 
 	return;
@@ -102,7 +102,7 @@ VOID FPSWait(VOID)
 			if (waitTime > 0
 				&& waitTime <= 1000.0f / fps.Value)
 			{
-				fps.Count++;
+				fps.Value++;
 			}
 			else
 			{
