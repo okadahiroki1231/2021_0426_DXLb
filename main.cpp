@@ -24,8 +24,8 @@ struct CHARACTOR
 
 //グローバル変数
 //シーンを管理する変数
-GAME_SCENE GameScene;		
-GAME_SCENE OldGameScene;	
+GAME_SCENE GameScene;
+GAME_SCENE OldGameScene;
 GAME_SCENE NextGameScene;
 
 //プレイヤー
@@ -36,8 +36,8 @@ CHARACTOR goal;
 
 
 //画面の切り替え
-BOOL IsFadeOut = FALSE;		
-BOOL IsFadeIn = FALSE;		
+BOOL IsFadeOut = FALSE;
+BOOL IsFadeIn = FALSE;
 
 int fadeTimeMill = 2000;					//切り替えミリ秒
 int fadeTimeMax = fadeTimeMill / 1000 * 60;	//ミリ秒をフレーム秒に変換
@@ -74,6 +74,8 @@ VOID ChangeScene(GAME_SCENE scene);	//シーン切り替え
 VOID CollUpdatePlayer(CHARACTOR* chara);	//当たり判定の領域を更新
 VOID CollUpdate(CHARACTOR* chara); //当たり判定
 
+BOOL OnCollRect(RECT a, RECT b); //短形と短形の当たり判定
+
 
 // プログラムは WinMain から始まります
 //Windowsのプログラミング方法 = (WinAPI)で動いている！
@@ -105,11 +107,11 @@ int WINAPI WinMain(
 	//ダブルバッファリング有効化
 	SetDrawScreen(DX_SCREEN_BACK);
 
-	
+
 
 	//最初のシーンは、タイトル画面から
 	GameScene = GAME_SCENE_TITLE;
-	
+
 	//ゲーム全体の初期化
 
 	//プレイヤーの画像を読み込み
@@ -128,60 +130,65 @@ int WINAPI WinMain(
 
 		DxLib_End(); //強制終了
 		return -1;//エラー終了
-	   }
+	}
 
 	//画像の幅と高さを取得
 	GetGraphSize(player.handle, &player.width, &player.height);
-
+	/*
 	//当たり判定を更新する
 	CollUpdatePlayer(&player);	//プレイヤーの当たり判定のアドレス
-
+	*/
 		//プレイヤーを初期化
-		player.x = GAME_WIDTH / 2 - player.width / 2;
-		player.y = GAME_HEIGHT / 2 - player.height / 2;
-		player.speed = 500;
-		player.IsDraw = TRUE;
+	player.x = GAME_WIDTH / 2 - player.width / 2;
+	player.y = GAME_HEIGHT / 2 - player.height / 2;
+	player.speed = 500;
+	player.IsDraw = TRUE;
+
+	//当たり判定を更新する
+	CollUpdatePlayer(&player);
 
 
 
-		//ゴールの画像を読み込み
-		strcpyDx(goal.path, ".\\Image\\Goal.jpg"); //パスのコピー
-		goal.handle = LoadGraph(goal.path);//画像の読み込み
+	//ゴールの画像を読み込み
+	strcpyDx(goal.path, ".\\Image\\Goal.jpg"); //パスのコピー
+	goal.handle = LoadGraph(goal.path);//画像の読み込み
 
-		//画像が読み込めなかったときは、エラー(-1)が入る
-		if (goal.handle == -1)
-		{
-			MessageBox(
-				GetMainWindowHandle(),//メインのウィンドウハンドル
-				goal.path,//メッセージ本文
-				"画像読み込みエラー！",//メッセージタイトル
-				MB_OK //ボタン
-			);
+	//画像が読み込めなかったときは、エラー(-1)が入る
+	if (goal.handle == -1)
+	{
+		MessageBox(
+			GetMainWindowHandle(),//メインのウィンドウハンドル
+			goal.path,//メッセージ本文
+			"画像読み込みエラー！",//メッセージタイトル
+			MB_OK //ボタン
+		);
 
-			DxLib_End(); //強制終了
-			return -1;//エラー終了
-		}
+		DxLib_End(); //強制終了
+		return -1;//エラー終了
+	}
 
-		//画像の幅と高さを取得
-		GetGraphSize(goal.handle, &goal.width, &goal.height);
+	//画像の幅と高さを取得
+	GetGraphSize(goal.handle, &goal.width, &goal.height);
+	/*
+	//当たり判定を更新する
+	CollUpdate(&goal);	//ゴールの当たり判定のアドレス
+	*/
+	//ゴールを初期化
+	goal.x = GAME_WIDTH - goal.width;
+	goal.y = 0;
+	goal.speed = 500;
+	goal.IsDraw = TRUE;
 
-		//当たり判定を更新する
-		CollUpdate(&goal);	//ゴールの当たり判定のアドレス
-
-			//ゴールを初期化
-		goal.x = GAME_WIDTH - goal.width;
-		goal.y = 0;
-		goal.speed = 500;
-		goal.IsDraw = TRUE;
-
+	CollUpdate(&goal);//ゴールの当たり判定のアドレス
 
 	//無限ループ
+
 	while (1)
 	{
-		if (ProcessMessage() != 0) { break; }	//メッセージを受け取り続ける
+		if (ProcessMessage() != 0) { break; }
 		if (ClearDrawScreen() != 0) { break; }	//画面を消去する
 
-		//キーボード入力の更新
+	//キーボード入力の更新
 		AllKeyUpdate();
 		//FPS値の更新
 		FPSUpdate();
@@ -225,7 +232,7 @@ int WINAPI WinMain(
 			}
 		}
 
-		
+
 
 		//FPS値を描画
 		FPSDraw();
@@ -234,9 +241,9 @@ int WINAPI WinMain(
 		FPSWait();
 
 		ScreenFlip();	//ダブルバッファリングした画面を描画
-	}
 
-	//終わるときの処理
+	}
+//終わるときの処理
 	DeleteGraph(player.handle);//画像をメモリ上から削除
 	DeleteGraph(goal.handle);//画像をメモリ上から削除
 
@@ -314,6 +321,7 @@ VOID Play(VOID)
 /// </summary>
 VOID PlayProc(VOID)
 {
+	/*
 	if (KeyClick(KEY_INPUT_RETURN) == TRUE)
 	{
 		//シーン切り替え
@@ -322,6 +330,8 @@ VOID PlayProc(VOID)
 		//エンド画面に切り替え
 		ChangeScene(GAME_SCENE_END);
 	}
+	*/
+
 	//プレイヤーの操作
 	if (KeyDown(KEY_INPUT_UP) == TRUE)
 	{
@@ -341,6 +351,16 @@ VOID PlayProc(VOID)
 	}
 	//当たり判定を更新する
 	CollUpdatePlayer(&player);
+
+	//プレイヤーがゴールに当たった時
+	if (OnCollRect(player.coll, goal.coll) == TRUE)
+	{
+		//エンド画面に切り替え
+		ChangeScene(GAME_SCENE_END);
+
+		//処理を強制終了
+		return;
+	}
 
 	return;
 }
@@ -543,4 +563,24 @@ VOID CollUpdate(CHARACTOR* chara)
 	chara->coll.bottom = chara->y + chara->height;
 
 	return;
+}
+;
+
+BOOL OnCollRect(RECT a,RECT b)
+{
+	if (
+		a.left < b.right &&
+		a.right > b.left &&
+		a.top < b.bottom &&
+		a.bottom > b.top
+		)
+	{
+		//当たった時
+		return TRUE;
+	}
+	else
+	{
+		//当たってないとき
+		return FALSE;
+	}
 }
