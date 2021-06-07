@@ -224,6 +224,11 @@ int WINAPI WinMain(
 	DeleteGraph(player.handle);		//画像をメモリ上から削除
 	DeleteGraph(Goal.handle);		//画像をメモリ上から削除
 
+	DeleteSoundMem(TitleBGM.handle);
+	DeleteSoundMem(PlayBGM.handle);
+	DeleteSoundMem(EndBGM.handle);
+
+
 	//ＤＸライブラリ使用の終了処理
 	DxLib_End();
 
