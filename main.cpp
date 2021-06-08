@@ -66,6 +66,9 @@ AUDIO TitleBGM;
 AUDIO PlayBGM;
 AUDIO EndBGM;
 
+//効果音
+AUDIO PlayerSE;
+
 //画面の切り替え
 BOOL IsFadeOut = FALSE;		//フェードアウト
 BOOL IsFadeIn = FALSE;		//フェードイン
@@ -228,6 +231,8 @@ int WINAPI WinMain(
 	DeleteSoundMem(PlayBGM.handle);
 	DeleteSoundMem(EndBGM.handle);
 
+	DeleteSoundMem(PlayerSE.handle);
+
 
 	//ＤＸライブラリ使用の終了処理
 	DxLib_End();
@@ -316,6 +321,10 @@ BOOL GameLoad(VOID)
 	if (!LoadAudio(&TitleBGM, ".\\Audio\\Title_BGM.mp3", 255, DX_PLAYTYPE_LOOP)) { return FALSE; }
 	if (!LoadAudio(&PlayBGM, ".\\Audio\\Play_BGM.mp3", 255, DX_PLAYTYPE_LOOP)) { return FALSE; }
 	if (!LoadAudio(&EndBGM, ".\\Audio\\End_BGM.mp3", 255, DX_PLAYTYPE_LOOP)) { return FALSE; }
+
+	//効果音を読み込む
+	if (!LoadAudio(&PlayerSE, ".\\Audio\\可愛い足音.mp3", 255, DX_PLAYTYPE_BACK)) { return FALSE; }
+	
 
 
 
@@ -482,19 +491,35 @@ VOID PlayProc(VOID)
 	if (KeyDown(KEY_INPUT_UP) == TRUE)
 	{
 		player.y -= player.speed * fps.DeltaTime;
+		if (CheckSoundMem(PlayerSE.handle) == 0)
+		{
+			PlaySoundMem(PlayerSE.handle, PlayerSE.playType);
+		}
 	}
 	if (KeyDown(KEY_INPUT_DOWN) == TRUE)
 	{
 		player.y += player.speed * fps.DeltaTime;
+		if (CheckSoundMem(PlayerSE.handle) == 0)
+		{
+			PlaySoundMem(PlayerSE.handle, PlayerSE.playType);
+		}
 	}
 
 	if (KeyDown(KEY_INPUT_LEFT) == TRUE)
 	{
 		player.x -= player.speed * fps.DeltaTime;
+		if (CheckSoundMem(PlayerSE.handle) == 0)
+		{
+			PlaySoundMem(PlayerSE.handle, PlayerSE.playType);
+		}
 	}
 	if (KeyDown(KEY_INPUT_RIGHT) == TRUE)
 	{
 		player.x += player.speed * fps.DeltaTime;
+		if (CheckSoundMem(PlayerSE.handle) == 0)
+		{
+			PlaySoundMem(PlayerSE.handle, PlayerSE.playType);
+		}
 	}
 
 	//当たり判定を更新する
