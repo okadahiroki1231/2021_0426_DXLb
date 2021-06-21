@@ -288,6 +288,34 @@ BOOL GameLoad(VOID)
 	//動画のボリューム
 	playMovie.Volume = 255;
 
+	//画像を読み込み
+	if (!LoadImageMem(&player.img, ".\\Image\\player.\png")) { return FALSE; }
+	if (!LoadImageMem(&Goal.img, ".\\Image\\Goal.\jpg")) { return FALSE; }
+
+	//ロゴを読み込み
+	if (!LoadImageMem(&TitleLogo, ".\\Image\\タイトル.\jpg")) { return FALSE; }
+	if (!LoadImageMem(&TitleEnter, ".\\Image\\push-enter.\jpg")) { return FALSE; }
+	if (!LoadImageMem(&EndClear, ".\\Image\\クリア画面.\jpg")) { return FALSE; }
+
+
+	//音楽を読み込む
+	if (!LoadAudio(&TitleBGM, ".\\Audio\\Title_BGM.mp3", 255, DX_PLAYTYPE_LOOP)) { return FALSE; }
+	if (!LoadAudio(&PlayBGM, ".\\Audio\\Play_BGM.mp3", 255, DX_PLAYTYPE_LOOP)) { return FALSE; }
+	if (!LoadAudio(&EndBGM, ".\\Audio\\End_BGM.mp3", 255, DX_PLAYTYPE_LOOP)) { return FALSE; }
+
+	//効果音を読み込む
+	if (!LoadAudio(&PlayerSE, ".\\Audio\\可愛い足音.mp3", 255, DX_PLAYTYPE_BACK)) { return FALSE; }
+
+
+
+
+
+	return TRUE;	//全て読み込みた！
+
+	
+
+	
+}
 	
 	BOOL LoadImageMem(IMAGE * image, const char* path)
 	{
@@ -300,7 +328,7 @@ BOOL GameLoad(VOID)
 		{
 			MessageBox(
 				GetMainWindowHandle(),	//メインのウィンドウハンドル
-				Goal.img.path,				//メッセージ本文
+				image->path,				//メッセージ本文
 				"画像読み込みエラー！",		//メッセージタイトル
 				MB_OK					//ボタン
 			);
@@ -309,33 +337,12 @@ BOOL GameLoad(VOID)
 		}
 
 		//画像の幅と高さを取得
-		GetGraphSize(image->handle, &image->width, &image->.height);
+		GetGraphSize(image->handle, &image->width, &image->height);
+
 
 		return TRUE;
 	}
-	//画像を読み込み
-	if (!LoadImageMem(&Player.img,".\\Image\\player.\png")) { return FALSE; }
-	if (!LoadImageMem(&Goal.img, ".\\Image\\goal.\jpg")) { return FALSE; }
-
-	//ロゴを読み込み
-	if (!LoadImageMem(&TitleLogo, ".\\Image\\タイトル.\ai")) { return FALSE; }
-	if (!LoadImageMem(&TitleEnter, ".\\Image\\push-enter.\ai")) { return FALSE; }
-	if (!LoadImageMem(&EndClear, ".\\Image\\クリア画面.\ai")) { return FALSE; }
 	
-
-	//音楽を読み込む
-	if (!LoadAudio(&TitleBGM, ".\\Audio\\Title_BGM.mp3", 255, DX_PLAYTYPE_LOOP)) { return FALSE; }
-	if (!LoadAudio(&PlayBGM, ".\\Audio\\Play_BGM.mp3", 255, DX_PLAYTYPE_LOOP)) { return FALSE; }
-	if (!LoadAudio(&EndBGM, ".\\Audio\\End_BGM.mp3", 255, DX_PLAYTYPE_LOOP)) { return FALSE; }
-
-	//効果音を読み込む
-	if (!LoadAudio(&PlayerSE, ".\\Audio\\可愛い足音.mp3", 255, DX_PLAYTYPE_BACK)) { return FALSE; }
-	
-
-
-
-
-	return TRUE;	//全て読み込みた！
 
 /// <summary>
 /// 音楽をメモリに読み込み
